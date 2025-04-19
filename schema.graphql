@@ -1,0 +1,140 @@
+type Token @entity {
+  id: ID!
+  name: String!
+  symbol: String!
+  decimals: Int!
+  totalSupply: BigInt!
+  totalTransfers: BigInt!
+  totalMints: BigInt!
+  totalBurns: BigInt!
+  holderCount: BigInt!
+  transferCount: BigInt!
+  approvalCount: BigInt!
+  
+  # Relationships
+  holders: [Account!]! @derivedFrom(field: "token")
+  transfers: [Transfer!]! @derivedFrom(field: "token")
+  approvals: [Approval!]! @derivedFrom(field: "token")
+  dailyMetrics: [DailyMetric!]! @derivedFrom(field: "token")
+}
+
+type Account @entity {
+  id: ID! # address
+  balance: BigInt!
+  transferCount: BigInt!
+  approvalCount: BigInt!
+  lastUpdated: BigInt!
+  
+  # Relationships
+  token: Token!
+  transfersFrom: [Transfer!]! @derivedFrom(field: "from")
+  transfersTo: [Transfer!]! @derivedFrom(field: "to")
+  approvalsOwner: [Approval!]! @derivedFrom(field: "owner")
+  approvalsSpender: [Approval!]! @derivedFrom(field: "spender")
+}
+
+type DailyMetric @entity {
+  id: ID! # tokenAddress-timestamp
+  date: String!
+  timestamp: BigInt!
+  
+  # Daily stats
+  dailyTransferCount: BigInt!
+  dailyTransferVolume: BigInt!
+  dailyActiveAccounts: BigInt!
+  dailyMintCount: BigInt!
+  dailyMintVolume: BigInt!
+  dailyBurnCount: BigInt!
+  dailyBurnVolume: BigInt!
+  
+  # Relationships
+  token: Token!
+}
+
+type Transaction @entity {
+  id: ID! # txHash
+  blockNumber: BigInt!
+  timestamp: BigInt!
+  transfers: [Transfer!]! @derivedFrom(field: "transaction")
+  approvals: [Approval!]! @derivedFrom(field: "transaction")
+}
+
+type Approval @entity(immutable: true) {
+  id: Bytes!
+  owner: Account!
+  spender: Account!
+  value: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  
+  # Relationships
+  token: Token!
+  transaction: Transaction!
+}
+
+type RoleAdminChanged @entity(immutable: true) {
+  id: Bytes!
+  role: Bytes! # bytes32
+  previousAdminRole: Bytes! # bytes32
+  newAdminRole: Bytes! # bytes32
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type RoleGranted @entity(immutable: true) {
+  id: Bytes!
+  role: Bytes! # bytes32
+  account: Bytes! # address
+  sender: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type RoleRevoked @entity(immutable: true) {
+  id: Bytes!
+  role: Bytes! # bytes32
+  account: Bytes! # address
+  sender: Bytes! # address
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+}
+
+type Transfer @entity(immutable: true) {
+  id: Bytes!
+  from: Account!
+  to: Account!
+  value: BigInt! # uint256
+  blockNumber: BigInt!
+  blockTimestamp: BigInt!
+  transactionHash: Bytes!
+  
+  # Relationships
+  token: Token!
+  transaction: Transaction!
+  
+  # Derived fields
+  isMint: Boolean!
+  isBurn: Boolean!
+}
+
+# Historical data tracking
+type AccountBalance @entity(immutable: true) {
+  id: ID! # account-blockNumber
+  account: Account!
+  token: Token!
+  value: BigInt!
+  blockNumber: BigInt!
+  timestamp: BigInt!
+}
+
+# Role tracking
+type Role @entity {
+  id: ID! # roleHash
+  name: String! # Known roles like DEFAULT_ADMIN_ROLE, MINTER_ROLE, etc.
+  adminRole: Role
+  accounts: [Bytes!]!
+}
