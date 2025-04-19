@@ -1,4 +1,4 @@
-type Token @entity {
+type Token @entity(immutable: false) {
   id: ID!
   name: String!
   symbol: String!
@@ -18,7 +18,7 @@ type Token @entity {
   dailyMetrics: [DailyMetric!]! @derivedFrom(field: "token")
 }
 
-type Account @entity {
+type Account @entity(immutable: false) {
   id: ID! # address
   balance: BigInt!
   transferCount: BigInt!
@@ -33,7 +33,7 @@ type Account @entity {
   approvalsSpender: [Approval!]! @derivedFrom(field: "spender")
 }
 
-type DailyMetric @entity {
+type DailyMetric @entity(immutable: false) {
   id: ID! # tokenAddress-timestamp
   date: String!
   timestamp: BigInt!
@@ -51,7 +51,7 @@ type DailyMetric @entity {
   token: Token!
 }
 
-type Transaction @entity {
+type Transaction @entity(immutable: false) {
   id: ID! # txHash
   blockNumber: BigInt!
   timestamp: BigInt!
@@ -132,7 +132,7 @@ type AccountBalance @entity(immutable: true) {
 }
 
 # Role tracking
-type Role @entity {
+type Role @entity(immutable: false) {
   id: ID! # roleHash
   name: String! # Known roles like DEFAULT_ADMIN_ROLE, MINTER_ROLE, etc.
   adminRole: Role
