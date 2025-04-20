@@ -1,4 +1,4 @@
-# Enhanced USDC Subgraph for Monad Testnet
+# USDC Subgraph for Monad Testnet
 
 This subgraph indexes and tracks USDC token data on the Monad testnet, providing comprehensive data about transfers, approvals, balances, and statistics.
 
