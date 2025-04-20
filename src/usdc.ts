@@ -32,17 +32,12 @@ function fetchToken(address: Address): Token {
   let token = Token.load(tokenId)
   
   if (token == null) {
-    let contract = USDC.bind(address)
     token = new Token(tokenId)
     
-    // Try to fetch token metadata
-    let nameResult = contract.try_name()
-    let symbolResult = contract.try_symbol()
-    let decimalsResult = contract.try_decimals()
-    
-    token.name = nameResult.reverted ? "USD Coin" : nameResult.value
-    token.symbol = symbolResult.reverted ? "USDC" : symbolResult.value
-    token.decimals = decimalsResult.reverted ? 6 : decimalsResult.value
+    // Hardcode token metadata to avoid RPC calls that might fail
+    token.name = "USD Coin"
+    token.symbol = "USDC"
+    token.decimals = 6
     
     token.totalSupply = ZERO_BI
     token.totalTransfers = ZERO_BI

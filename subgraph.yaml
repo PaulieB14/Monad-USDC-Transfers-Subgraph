@@ -10,7 +10,7 @@ dataSources:
     source:
       address: "0xf817257fed379853cDe0fa4F97AB987181B1E5Ea"
       abi: USDC
-      startBlock: 1697560
+      startBlock: 1800000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
