@@ -97,7 +97,7 @@ function fetchDailyMetric(tokenAddress: Address, timestamp: BigInt): DailyMetric
   let metric = DailyMetric.load(id)
   if (metric == null) {
     metric = new DailyMetric(id)
-    metric.date = dayID
+    metric.date = dayID // Store as Unix day (seconds since epoch / 86400)
     metric.timestamp = timestamp
     metric.dailyTransferCount = ZERO_BI
     metric.dailyTransferVolume = ZERO_BI
