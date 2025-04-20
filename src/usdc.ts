@@ -88,18 +88,6 @@ function fetchTransaction(event: ethereum.Event): Transaction {
   return transaction as Transaction
 }
 
-// Function to convert timestamp to YYYY-MM-DD format
-function formatDateFromTimestamp(timestamp: BigInt): string {
-  // Convert seconds to milliseconds and create a Date object
-  let date = new Date(timestamp.toI32() * 1000)
-  
-  let year = date.getUTCFullYear()
-  let month = ('0' + (date.getUTCMonth() + 1)).slice(-2) // Add leading zero if needed
-  let day = ('0' + date.getUTCDate()).slice(-2) // Add leading zero if needed
-  
-  return year.toString() + '-' + month + '-' + day
-}
-
 function fetchDailyMetric(tokenAddress: Address, timestamp: BigInt): DailyMetric {
   // Timestamp rounded to the day (86400 seconds in a day)
   let dayID = timestamp.div(BigInt.fromI32(86400)).toString()
@@ -109,7 +97,7 @@ function fetchDailyMetric(tokenAddress: Address, timestamp: BigInt): DailyMetric
   let metric = DailyMetric.load(id)
   if (metric == null) {
     metric = new DailyMetric(id)
-    metric.date = formatDateFromTimestamp(timestamp) // Store as YYYY-MM-DD format
+    metric.date = timestamp.toString() // Store as Unix timestamp
     metric.timestamp = timestamp
     metric.dailyTransferCount = ZERO_BI
     metric.dailyTransferVolume = ZERO_BI
