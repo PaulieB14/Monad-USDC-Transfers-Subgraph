@@ -128,20 +128,12 @@ This subgraph indexes and tracks USDC token data on the Monad testnet, providing
 }
 ```
 
-### Get Mint/Burn Activity
+### GetRecentMintTransfers
 
 ```graphql
-{
-  # Get mints
+query GetRecentMintTransfers {
   transfers(where: { isMint: true }, orderBy: blockTimestamp, orderDirection: desc) {
-    to { id }
-    value
-    blockTimestamp
-  }
-  
-  # Get burns
-  transfers(where: { isBurn: true }, orderBy: blockTimestamp, orderDirection: desc) {
-    from { id }
+    id
     value
     blockTimestamp
   }
