@@ -3,9 +3,8 @@ import {
   RoleAdminChanged as RoleAdminChangedEvent,
   RoleGranted as RoleGrantedEvent,
   RoleRevoked as RoleRevokedEvent,
-  Transfer as TransferEvent,
-  USDC
-} from "../generated/USDC/USDC"
+  Transfer as TransferEvent
+} from "../generated/templates/USDC/USDC"
 import {
   Approval,
   RoleAdminChanged,
@@ -32,13 +31,13 @@ function fetchToken(address: Address): Token {
   let token = Token.load(tokenId)
   
   if (token == null) {
+    // This shouldn't happen with the factory setup, as tokens should be created by the factory
+    // But handle it just in case
     token = new Token(tokenId)
-    
-    // Hardcode token metadata to avoid RPC calls that might fail
+    token.creator = Bytes.fromHexString(ZERO_ADDRESS)
     token.name = "USD Coin"
     token.symbol = "USDC"
     token.decimals = 6
-    
     token.totalSupply = ZERO_BI
     token.totalTransfers = ZERO_BI
     token.totalMints = ZERO_BI
@@ -46,7 +45,8 @@ function fetchToken(address: Address): Token {
     token.holderCount = ZERO_BI
     token.transferCount = ZERO_BI
     token.approvalCount = ZERO_BI
-    
+    token.createdAtTimestamp = ZERO_BI
+    token.createdAtBlockNumber = ZERO_BI
     token.save()
   }
   
@@ -54,7 +54,9 @@ function fetchToken(address: Address): Token {
 }
 
 function fetchAccount(address: Address, tokenAddress: Address): Account {
-  let accountId = address.toHexString()
+  // Create a unique ID that combines the account address and token address
+  // This allows the same account to interact with multiple tokens
+  let accountId = address.toHexString() + "-" + tokenAddress.toHexString()
   let account = Account.load(accountId)
   
   if (account == null) {
