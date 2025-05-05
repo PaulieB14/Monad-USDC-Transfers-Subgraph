@@ -1,8 +1,8 @@
 {
   "monad-testnet": {
-    "USDC": {
+    "USDCFactory": {
       "address": "0xf817257fed379853cDe0fa4F97AB987181B1E5Ea",
-      "startBlock": 1697560
+      "startBlock": 15000000
     }
   }
 }
