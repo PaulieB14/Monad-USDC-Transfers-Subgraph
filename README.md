@@ -1,13 +1,19 @@
-# USDC Subgraph for Monad Testnet
+# USDC Factory Subgraph for Monad Testnet
 
-This subgraph indexes and tracks USDC token [contract 0xf817257fed379853cDe0fa4F97AB987181B1E5Ea] data on the Monad testnet, providing comprehensive data about transfers, approvals, balances, and statistics.
+This subgraph indexes and tracks a USDC token factory contract and all tokens created through it on the Monad testnet. It provides comprehensive data about token creation, transfers, approvals, balances, and statistics.
 
 ## Features
+
+### Factory Tracking
+- Token creation events
+- Count of tokens created through the factory
+- Relationships between factory and tokens
 
 ### Token Information
 - Basic metadata (name, symbol, decimals)
 - Total supply tracking
 - Aggregate statistics (transfers, mints, burns, holders)
+- Creation details (timestamp, block number, creator)
 
 ### Account Tracking
 - Real-time balance updates
@@ -33,7 +39,8 @@ This subgraph indexes and tracks USDC token [contract 0xf817257fed379853cDe0fa4F
 
 ### Main Entities
 
-- **Token**: Tracks token metadata and aggregate statistics
+- **USDCFactory**: Tracks the factory contract that creates new tokens
+- **Token**: Tracks token metadata and aggregate statistics for each created token
 - **Account**: Tracks user balances and activity
 - **Transfer**: Records all token transfers with relationships
 - **Approval**: Records all approval events with relationships
@@ -44,11 +51,31 @@ This subgraph indexes and tracks USDC token [contract 0xf817257fed379853cDe0fa4F
 
 ## Queries
 
+### Get Factory Information
+
+```graphql
+{
+  usdcFactory(id: "0xf817257fed379853cDe0fa4F97AB987181B1E5Ea") {
+    id
+    tokenCount
+    tokens {
+      id
+      name
+      symbol
+      decimals
+      totalSupply
+      creator
+      createdAtTimestamp
+    }
+  }
+}
+```
+
 ### Get Token Information
 
 ```graphql
 {
-  token(id: "0xf817257fed379853cDe0fa4F97AB987181B1E5Ea") {
+  token(id: "0xTokenAddress") {
     name
     symbol
     decimals
@@ -58,6 +85,12 @@ This subgraph indexes and tracks USDC token [contract 0xf817257fed379853cDe0fa4F
     totalTransfers
     totalMints
     totalBurns
+    factory {
+      id
+    }
+    creator
+    createdAtTimestamp
+    createdAtBlockNumber
   }
 }
 ```
@@ -66,11 +99,15 @@ This subgraph indexes and tracks USDC token [contract 0xf817257fed379853cDe0fa4F
 
 ```graphql
 {
-  account(id: "0xYourAccountAddress") {
+  account(id: "0xYourAccountAddress-0xTokenAddress") {
     balance
     transferCount
     approvalCount
     lastUpdated
+    token {
+      name
+      symbol
+    }
     transfersFrom {
       to { id }
       value
@@ -85,11 +122,16 @@ This subgraph indexes and tracks USDC token [contract 0xf817257fed379853cDe0fa4F
 }
 ```
 
-### Get Daily Statistics
+### Get Daily Statistics for a Token
 
 ```graphql
 {
-  dailyMetrics(orderBy: timestamp, orderDirection: desc, first: 7) {
+  dailyMetrics(
+    where: { token: "0xTokenAddress" }
+    orderBy: timestamp
+    orderDirection: desc
+    first: 7
+  ) {
     date
     dailyTransferCount
     dailyTransferVolume
@@ -102,22 +144,32 @@ This subgraph indexes and tracks USDC token [contract 0xf817257fed379853cDe0fa4F
 }
 ```
 
-### Get Top Token Holders
+### Get Top Token Holders for a Specific Token
 
 ```graphql
 {
-  accounts(orderBy: balance, orderDirection: desc, first: 10) {
+  accounts(
+    where: { token: "0xTokenAddress" }
+    orderBy: balance
+    orderDirection: desc
+    first: 10
+  ) {
     id
     balance
   }
 }
 ```
 
-### Get Recent Transfers
+### Get Recent Transfers for a Specific Token
 
 ```graphql
 {
-  transfers(orderBy: blockTimestamp, orderDirection: desc, first: 100) {
+  transfers(
+    where: { token: "0xTokenAddress" }
+    orderBy: blockTimestamp
+    orderDirection: desc
+    first: 100
+  ) {
     from { id }
     to { id }
     value
@@ -128,12 +180,17 @@ This subgraph indexes and tracks USDC token [contract 0xf817257fed379853cDe0fa4F
 }
 ```
 
-### GetRecentMintTransfers
+### Get Recent Mint Transfers for a Specific Token
 
 ```graphql
 query GetRecentMintTransfers {
-  transfers(where: { isMint: true }, orderBy: blockTimestamp, orderDirection: desc) {
+  transfers(
+    where: { token: "0xTokenAddress", isMint: true }
+    orderBy: blockTimestamp
+    orderDirection: desc
+  ) {
     id
+    to { id }
     value
     blockTimestamp
   }
@@ -147,11 +204,18 @@ query GetRecentMintTransfers {
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd erc-20-transfers
+cd Monad-USDC-Transfers-Subgraph
 
 # Install dependencies
 npm install
 ```
+
+### Configuration
+
+Before deploying the subgraph, you need to:
+
+1. Replace `"0xf817257fed379853cDe0fa4F97AB987181B1E5Ea"` in `subgraph.yaml` and `networks.json` with your actual factory contract address
+2. Update the start block if needed (currently set to block 15000000)
 
 ### Building the Subgraph
 
