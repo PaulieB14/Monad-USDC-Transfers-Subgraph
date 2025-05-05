@@ -1,5 +1,13 @@
+type USDCFactory @entity(immutable: true) {
+  id: ID! # Factory contract address
+  tokenCount: BigInt!
+  tokens: [Token!]! @derivedFrom(field: "factory")
+}
+
 type Token @entity(immutable: false) {
   id: ID!
+  factory: USDCFactory # Reference to the factory that created this token
+  creator: Bytes! # Address of the creator who called the factory
   name: String!
   symbol: String!
   decimals: Int!
@@ -10,6 +18,8 @@ type Token @entity(immutable: false) {
   holderCount: BigInt!
   transferCount: BigInt!
   approvalCount: BigInt!
+  createdAtTimestamp: BigInt!
+  createdAtBlockNumber: BigInt!
   
   # Relationships
   holders: [Account!]! @derivedFrom(field: "token")
@@ -19,7 +29,7 @@ type Token @entity(immutable: false) {
 }
 
 type Account @entity(immutable: false) {
-  id: ID! # address
+  id: ID! # address-tokenAddress
   balance: BigInt!
   transferCount: BigInt!
   approvalCount: BigInt!
