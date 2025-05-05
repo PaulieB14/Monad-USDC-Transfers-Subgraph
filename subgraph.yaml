@@ -5,12 +5,35 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
+    name: USDCFactory
+    network: monad-testnet
+    source:
+      address: "0xf817257fed379853cDe0fa4F97AB987181B1E5Ea" # Using the same address as USDC for now, replace with actual factory address
+      abi: USDCFactory
+      startBlock: 15000000
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.9
+      language: wasm/assemblyscript
+      entities:
+        - USDCFactory
+        - Token
+      abis:
+        - name: USDCFactory
+          file: ./abis/USDCFactory.json
+        - name: USDC
+          file: ./abis/USDC.json
+      eventHandlers:
+        - event: TokenCreated(indexed address,indexed address)
+          handler: handleTokenCreated
+      file: ./src/factory.ts
+
+templates:
+  - kind: ethereum
     name: USDC
     network: monad-testnet
     source:
-      address: "0xf817257fed379853cDe0fa4F97AB987181B1E5Ea"
       abi: USDC
-      startBlock: 1800000
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.9
