@@ -37,8 +37,8 @@ function fetchToken(address: Address): Token {
     token.creator = Bytes.fromHexString(ZERO_ADDRESS)
     token.name = "USD Coin"
     token.symbol = "USDC"
-    // FIXED: Contract analysis shows this token returns 18 decimals, not 6!
-    token.decimals = 18
+    // CORRECTED: MonadExplorer contract verification shows 6 decimals (not 18)
+    token.decimals = 6
     token.totalSupply = ZERO_BI
     token.totalTransfers = ZERO_BI
     token.totalMints = ZERO_BI
